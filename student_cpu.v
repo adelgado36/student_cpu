@@ -33,12 +33,12 @@ module alucontrol(input wire [5:0] func, input wire [1:0] aluOp, output wire [3:
     reg[3:0] Aluctrl;   
     always @(*)
     begin
-    case(func)
+    case(func)   //Activate when aluOp changes
     32: Aluctrl = 2;    //Add
     34: Aluctrl = 6;    //Sub
     36: Aluctrl = 0;    //AND
     37: Aluctrl = 1;    //OR
-    default: Aluctrl = 2;
+    default: Aluctrl = 2; //The default of the ALU is an addition
     endcase
     end
 assign aluctrl = Aluctrl;
@@ -114,31 +114,31 @@ endmodule
 module controlpathfsm(input wire rst, input wire clk, input wire newInstruction, input wire [5:0] opcode, 
                         output reg _RegWrite, output reg _MemRead, output reg _MemWrite);
 
-                 always @(posedge newInstruction)
-						begin
-						 case(opcode)
-						 0:begin
-                            #3 _MemRead = 0;
+	always @(posedge newInstruction) //When a new instruction is fetch this activates
+			    begin
+			    case(opcode) //Case statment for the value of the opcode 
+			    0:begin
+                            #3 _MemRead = 0; //When the opcode is 0 _RegWrite is 1, _MemRead and MemWrite are 0
                             #3 _RegWrite = 1;
                             #1 _MemWrite = 0;
-                               _MemRead = 0;
-						       _RegWrite = 0;
+			       _MemRead = 0; //At the end the _MemRead, _MemWrite and RegWrite are set to 0
+	                       _RegWrite = 0;
                                _MemWrite = 0;                           
                             end
-						 35: begin
-						 #3 _MemRead = 1;
-						 #3 _RegWrite =1;
-                         #1 _MemWrite = 0;
+			    35: begin
+			    #3 _MemRead = 1;
+			    #3 _RegWrite =1;
+                            #1 _MemWrite = 0;
                             _MemRead = 0;
-						    _RegWrite = 0;
+			    _RegWrite = 0;
                             _MemWrite = 0;                            
-						 end
-						 43: begin
-                         #3 _MemRead = 0;
-						 #3 _RegWrite =0;
-                         #1 _MemWrite = 1;
+			    end
+			    43: begin
+                            #3 _MemRead = 0;
+	     		    #3 _RegWrite =0;
+                            #1 _MemWrite = 1;
                             _MemRead = 0;
-						    _RegWrite = 0;
+			    _RegWrite = 0;
                             _MemWrite = 0;
                             end
                          endcase
